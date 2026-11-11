@@ -1,4 +1,4 @@
-/** Shared show timeline: one 20s loop of keyframed states, in the spirit of
+/** Shared show timeline: one 14s loop of keyframed states, in the spirit of
  *  the reference recording — low arc → big band crossing the headline → thin
  *  strip riding high while the headline zooms → ribbon flattens into a grid
  *  (headline gone) → headline splits wide with a low small arc → loop. */
@@ -19,14 +19,14 @@ interface Key extends Omit<TLState, 'time01'> {
 
 const KEYS: Key[] = [
   { t: 0, bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0, headScale: 1.0, headSplit: 0, headOp: 1 },
-  { t: 4, bend: 0.5, yOff: 0.05, tile: 1.3, grid: 0, headScale: 1.04, headSplit: 0.06, headOp: 1 },
-  { t: 8, bend: 1.15, yOff: 1.55, tile: 0.55, grid: 0, headScale: 1.45, headSplit: 0.22, headOp: 1 },
-  { t: 12, bend: 0.0, yOff: 0.0, tile: 1.5, grid: 1, headScale: 1.0, headSplit: 0, headOp: 0 },
-  { t: 16, bend: 0.85, yOff: -1.35, tile: 0.7, grid: 0, headScale: 1.0, headSplit: 1, headOp: 1 },
-  { t: 20, bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0, headScale: 1.0, headSplit: 0, headOp: 1 },
+  { t: 3, bend: 0.5, yOff: 0.05, tile: 1.3, grid: 0, headScale: 1.04, headSplit: 0.06, headOp: 1 },
+  { t: 6, bend: 1.15, yOff: 1.55, tile: 0.55, grid: 0, headScale: 1.45, headSplit: 0.22, headOp: 1 },
+  { t: 9, bend: 0.0, yOff: 0.0, tile: 1.5, grid: 1, headScale: 1.0, headSplit: 0, headOp: 0 },
+  { t: 12, bend: 0.85, yOff: -1.35, tile: 0.7, grid: 0, headScale: 1.0, headSplit: 1, headOp: 1 },
+  { t: 14, bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0, headScale: 1.0, headSplit: 0, headOp: 1 },
 ]
 
-export const LOOP = 20
+export const LOOP = 14
 
 const smooth = (u: number) => u * u * (3 - 2 * u)
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u

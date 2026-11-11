@@ -129,7 +129,7 @@ function Flow({
     tl.current = s
     swaySm.current += (drag.current.sway - swaySm.current) * 0.04
     const bend = s.bend + swaySm.current * 0.35
-    flow.current += delta * 0.038 + drag.current.vel
+    flow.current += delta * 0.06 + drag.current.vel
     drag.current.vel *= 0.94
 
     const e = s.grid * s.grid * (3 - 2 * s.grid)
