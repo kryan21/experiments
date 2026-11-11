@@ -1,20 +1,15 @@
-/** Shared show timeline v2 — rebuilt after a close second study of the
- *  reference recording (2026-11-11). The real motion is a closed cylinder
- *  carousel: a strip of tiles wrapped around a vertical ring, rotating
- *  continuously, front face travelling right-to-left, tiles swelling with
- *  perspective as they round the front. The headline NEVER moves — it is
- *  only covered by the front pass or faded. Phases in one ~14s loop:
- *  close pass (ring big, centred, fast) → ring shrinks and drops into a
- *  thin strip low under the headline (long calm moment) → six tiles fly
- *  into a flat 3x2 grid and HOLD (interactive in our build) → fly out →
- *  back to the close pass. */
+/** Shared show timeline: one 20s loop of keyframed states, in the spirit of
+ *  the reference recording — low arc → big band crossing the headline → thin
+ *  strip riding high while the headline zooms → ribbon flattens into a grid
+ *  (headline gone) → headline splits wide with a low small arc → loop. */
 export interface TLState {
-  ringScale: number // overall size of the cylinder
-  ringY: number // vertical placement of the ring
-  ringTilt: number // x-axis tilt of the ring (diagonal read)
-  rotSpeed: number // angular speed multiplier
-  grid: number // 0 = ring, 1 = flattened 3x2 grid
-  headOp: number // headline opacity (it never transforms)
+  bend: number // arc height of the ribbon's curve
+  yOff: number // vertical placement of the ribbon
+  tile: number // tile scale on the ribbon
+  grid: number // 0 = ribbon, 1 = flattened grid
+  headScale: number
+  headSplit: number // 0..1 — headline lines slide apart
+  headOp: number
   time01: number
 }
 
@@ -23,24 +18,15 @@ interface Key extends Omit<TLState, 'time01'> {
 }
 
 const KEYS: Key[] = [
-  { t: 0.0, ringScale: 1.1, ringY: 0.15, ringTilt: 0.06, rotSpeed: 1.05, grid: 0, headOp: 0.3 },
-  { t: 2.2, ringScale: 1.0, ringY: -0.3, ringTilt: 0.12, rotSpeed: 0.8, grid: 0, headOp: 0.95 },
-  { t: 3.4, ringScale: 0.4, ringY: -2.85, ringTilt: 0.5, rotSpeed: 0.5, grid: 0, headOp: 1 },
-  { t: 6.8, ringScale: 0.4, ringY: -2.85, ringTilt: 0.5, rotSpeed: 0.45, grid: 0, headOp: 1 },
-  { t: 7.8, ringScale: 0.75, ringY: -1.0, ringTilt: 0.18, rotSpeed: 0.4, grid: 1, headOp: 0 },
-  { t: 12.2, ringScale: 0.75, ringY: -1.0, ringTilt: 0.18, rotSpeed: 0.4, grid: 1, headOp: 0 },
-  { t: 13.2, ringScale: 1.05, ringY: 0.0, ringTilt: 0.08, rotSpeed: 1.0, grid: 0, headOp: 0.35 },
-  { t: 14.0, ringScale: 1.1, ringY: 0.15, ringTilt: 0.06, rotSpeed: 1.05, grid: 0, headOp: 0.3 },
+  { t: 0, bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0, headScale: 1.0, headSplit: 0, headOp: 1 },
+  { t: 4, bend: 0.5, yOff: 0.05, tile: 1.3, grid: 0, headScale: 1.04, headSplit: 0.06, headOp: 1 },
+  { t: 8, bend: 1.15, yOff: 1.55, tile: 0.55, grid: 0, headScale: 1.45, headSplit: 0.22, headOp: 1 },
+  { t: 12, bend: 0.0, yOff: 0.0, tile: 1.5, grid: 1, headScale: 1.0, headSplit: 0, headOp: 0 },
+  { t: 16, bend: 0.85, yOff: -1.35, tile: 0.7, grid: 0, headScale: 1.0, headSplit: 1, headOp: 1 },
+  { t: 20, bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0, headScale: 1.0, headSplit: 0, headOp: 1 },
 ]
 
-export const LOOP = 14
-
-/** Runtime show controls shared between the canvas and the DOM chrome. */
-export const showState = {
-  paused: false, // true while a grid tile is opened full-screen
-  freezeT: null as number | null, // dev/check aid: ?t=<seconds> pins the loop
-  loops: 0, // completed loops — the grid alternates tile subsets per loop
-}
+export const LOOP = 20
 
 const smooth = (u: number) => u * u * (3 - 2 * u)
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u
@@ -53,16 +39,17 @@ export function evalTimeline(time: number, out: TLState): TLState {
   const a = KEYS[i]
   const b = KEYS[i + 1]
   const u = smooth(Math.min(1, Math.max(0, (t - a.t) / (b.t - a.t))))
-  out.ringScale = lerp(a.ringScale, b.ringScale, u)
-  out.ringY = lerp(a.ringY, b.ringY, u)
-  out.ringTilt = lerp(a.ringTilt, b.ringTilt, u)
-  out.rotSpeed = lerp(a.rotSpeed, b.rotSpeed, u)
+  out.bend = lerp(a.bend, b.bend, u)
+  out.yOff = lerp(a.yOff, b.yOff, u)
+  out.tile = lerp(a.tile, b.tile, u)
   out.grid = lerp(a.grid, b.grid, u)
+  out.headScale = lerp(a.headScale, b.headScale, u)
+  out.headSplit = lerp(a.headSplit, b.headSplit, u)
   out.headOp = lerp(a.headOp, b.headOp, u)
   return out
 }
 
 export const newTLState = (): TLState => ({
-  ringScale: 1.1, ringY: 0.15, ringTilt: 0.06, rotSpeed: 1.05,
-  grid: 0, headOp: 0.3, time01: 0,
+  bend: 0.95, yOff: -1.25, tile: 0.8, grid: 0,
+  headScale: 1, headSplit: 0, headOp: 1, time01: 0,
 })
