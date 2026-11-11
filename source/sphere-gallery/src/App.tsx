@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import ChromeSphere from './components/ChromeSphere'
-import TileSphere, { type DragState } from './components/TileSphere'
-import { PROJECTS, img, type Project } from './data'
+import TileSphere, { type DragState, type MorphState } from './components/TileSphere'
+import { img, type Project } from './data'
 
-const SECTIONS = ['hero', 'craft', 'identity', 'gallery', 'projects'] as const
+const SECTIONS = ['hero', 'craft', 'identity', 'gallery'] as const
 type Section = (typeof SECTIONS)[number]
 
 const NAV: { key: Section; label: string }[] = [
@@ -12,7 +12,6 @@ const NAV: { key: Section; label: string }[] = [
   { key: 'craft', label: '2' },
   { key: 'identity', label: '3' },
   { key: 'gallery', label: 'Gallery' },
-  { key: 'projects', label: 'Projects' },
 ]
 
 const serif = { fontFamily: "'Playfair Display', Didot, serif" }
@@ -102,39 +101,58 @@ function Identity() {
 }
 
 function Gallery({
-  drag, onSelect,
+  drag, morph, open, onToggle, onSelect,
 }: {
   drag: React.MutableRefObject<DragState>
+  morph: React.MutableRefObject<MorphState>
+  open: boolean
+  onToggle: (open: boolean) => void
   onSelect: (p: Project) => void
 }) {
   const last = useRef<{ x: number; y: number } | null>(null)
+  const touchY = useRef<number | null>(null)
+  // NOTE: no setPointerCapture here — capturing on the wrapper would steal
+  // the canvas's pointer events and tile clicks would never fire. Drag is
+  // tracked with window-level listeners instead.
   const down = (e: React.PointerEvent) => {
     last.current = { x: e.clientX, y: e.clientY }
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-  }
-  const move = (e: React.PointerEvent) => {
-    if (!last.current) return
-    const dx = e.clientX - last.current.x
-    const dy = e.clientY - last.current.y
-    last.current = { x: e.clientX, y: e.clientY }
-    drag.current.oy += dx * 0.0052
-    drag.current.ox += dy * 0.0052
-    drag.current.vy = dx * 0.0052
-    drag.current.vx = dy * 0.0052
-  }
-  const up = () => {
-    last.current = null
+    const move = (ev: PointerEvent) => {
+      if (!last.current) return
+      const dx = ev.clientX - last.current.x
+      const dy = ev.clientY - last.current.y
+      last.current = { x: ev.clientX, y: ev.clientY }
+      drag.current.oy += dx * 0.0052
+      drag.current.ox += dy * 0.0052
+      drag.current.vy = dx * 0.0052
+      drag.current.vx = dy * 0.0052
+    }
+    const up = () => {
+      last.current = null
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
   }
   return (
-    <div className="relative h-full">
+    <div
+      className="relative h-full"
+      onTouchStart={(e) => {
+        touchY.current = e.touches[0].clientY
+      }}
+      onTouchEnd={(e) => {
+        if (touchY.current === null) return
+        const dy = touchY.current - e.changedTouches[0].clientY
+        touchY.current = null
+        if (dy > 60 && !open) onToggle(true)
+        else if (dy < -60 && open) onToggle(false)
+      }}
+    >
       <div
         className="absolute inset-0 cursor-grab active:cursor-grabbing"
         onPointerDown={down}
-        onPointerMove={move}
-        onPointerUp={up}
-        onPointerCancel={up}
       >
-        <TileSphere drag={drag} onSelect={onSelect} />
+        <TileSphere drag={drag} morph={morph} onSelect={onSelect} />
       </div>
       <p className="micro micro-bright pointer-events-none absolute left-6 top-1/2 hidden -translate-y-1/2 md:block">
         Kryan
@@ -142,45 +160,12 @@ function Gallery({
       <p className="micro micro-bright pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 text-right md:block">
         Websites &amp; Motion
       </p>
-      <p className="micro pointer-events-none absolute bottom-24 left-1/2 -translate-x-1/2">
-        Drag to explore — tap a tile to open
-      </p>
-    </div>
-  )
-}
-
-function Projects({ onSelect }: { onSelect: (p: Project) => void }) {
-  return (
-    <div className="flex h-full flex-col justify-center px-8 py-24 md:px-16">
-      <p className="micro micro-bright">A Curated Selection</p>
-      <h2 style={serif} className="mt-4 text-4xl font-medium text-white md:text-5xl">
-        Crafted for the <em className="italic">web</em>
-      </h2>
-      <div
-        data-nonav
-        className="no-scrollbar -mx-8 mt-12 flex gap-5 overflow-x-auto px-8 pb-4 md:-mx-16 md:px-16"
+      <button
+        onClick={() => onToggle(!open)}
+        className="micro micro-bright absolute bottom-24 left-1/2 -translate-x-1/2 rounded-full border border-white/20 bg-white/[0.05] px-5 py-2.5 backdrop-blur-md transition hover:bg-white hover:text-black"
       >
-        {PROJECTS.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => onSelect(p)}
-            className="group w-64 shrink-0 text-left md:w-80"
-          >
-            <div className="overflow-hidden rounded-md">
-              <img
-                src={img(p, 640, 420)}
-                alt={p.title}
-                loading="lazy"
-                className="aspect-[3/2] w-full object-cover transition duration-500 group-hover:scale-105"
-              />
-            </div>
-            <p style={serif} className="mt-4 text-xl text-white">{p.title}</p>
-            <p className="micro mt-1">
-              {p.tag} — {p.year}
-            </p>
-          </button>
-        ))}
-      </div>
+        {open ? '↑ Close — back to the sphere' : 'Scroll ↓ — the sphere opens'}
+      </button>
     </div>
   )
 }
@@ -230,8 +215,15 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
 export default function App() {
   const [section, setSection] = useState<Section>('hero')
   const [selected, setSelected] = useState<Project | null>(null)
+  const [galleryOpen, setGalleryOpen] = useState(false)
   const drag = useRef<DragState>({ ox: 0, oy: 0, vx: 0, vy: 0 })
+  const morph = useRef<MorphState>({ value: 0, target: 0 })
   const wheelLock = useRef(0)
+
+  const setOpen = useCallback((open: boolean) => {
+    morph.current.target = open ? 1 : 0
+    setGalleryOpen(open)
+  }, [])
 
   const go = useCallback(
     (dir: 1 | -1) => {
@@ -250,18 +242,38 @@ export default function App() {
     const now = performance.now()
     if (now - wheelLock.current < 1000) return
     if (Math.abs(e.deltaY) < 24) return
+    if (section === 'gallery') {
+      // the gallery eats the first scroll each way: it opens / closes the sphere
+      if (e.deltaY > 0 && morph.current.target === 0) {
+        wheelLock.current = now
+        setOpen(true)
+        return
+      }
+      if (e.deltaY < 0 && morph.current.target === 1) {
+        wheelLock.current = now
+        setOpen(false)
+        return
+      }
+      if (e.deltaY > 0) return // already open — gallery is the last section
+    }
     wheelLock.current = now
     go(e.deltaY > 0 ? 1 : -1)
   }
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') go(1)
-      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') go(-1)
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        if (section === 'gallery' && morph.current.target === 0) setOpen(true)
+        else go(1)
+      }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        if (section === 'gallery' && morph.current.target === 1) setOpen(false)
+        else go(-1)
+      }
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [go])
+  }, [go, section, setOpen])
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-black" onWheel={onWheel}>
@@ -277,8 +289,9 @@ export default function App() {
           {section === 'hero' && <Hero />}
           {section === 'craft' && <Craft />}
           {section === 'identity' && <Identity />}
-          {section === 'gallery' && <Gallery drag={drag} onSelect={setSelected} />}
-          {section === 'projects' && <Projects onSelect={setSelected} />}
+          {section === 'gallery' && (
+            <Gallery drag={drag} morph={morph} open={galleryOpen} onToggle={setOpen} onSelect={setSelected} />
+          )}
         </motion.main>
       </AnimatePresence>
 
