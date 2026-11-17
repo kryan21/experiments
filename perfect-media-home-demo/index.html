@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Perfect Media — Homepage Ideas Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+<style>
+  :root{ --ivory:#faf6ee; --cream:#f2ead9; --ink:#17130c; --inksoft:#4a4234; --gold:#a8823a; --golddeep:#8a6a2a; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ background:var(--ivory); color:var(--ink); font-family:Jost,sans-serif; -webkit-font-smoothing:antialiased; }
+  .caps{ letter-spacing:.34em; text-transform:uppercase; font-size:.66rem; font-weight:500; }
+  .gold{ color:var(--gold); } .serif-i{ font-family:"Cormorant Garamond",serif; font-style:italic; }
+  .display{ font-family:Marcellus,serif; }
+  section{ padding:84px 20px; max-width:1100px; margin:0 auto; }
+  .head{ text-align:center; margin-bottom:44px; }
+  .head h2{ font-family:Marcellus,serif; font-weight:400; font-size:clamp(1.9rem,5vw,3rem); margin-top:14px; }
+  .head p{ font-family:"Cormorant Garamond",serif; font-style:italic; color:var(--inksoft); font-size:1.15rem; margin-top:10px; }
+  .rule{ width:56px; height:1px; background:var(--gold); margin:20px auto 0; }
+  .tag{ display:inline-block; border:1px solid var(--gold); color:var(--golddeep); padding:6px 14px; border-radius:999px; }
+  button.replay{ background:none; border:1px solid var(--gold); color:var(--golddeep); padding:10px 22px; cursor:pointer; }
+  button.replay:hover{ background:var(--gold); color:var(--ivory); }
+
+  /* ---------- 1. Preloader ---------- */
+  #loader{ position:fixed; inset:0; z-index:100; background:var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; transition:transform 1s cubic-bezier(.22,1,.36,1); }
+  #loader.done{ transform:translateY(-100%); }
+  #loader svg path, #loader svg rect{ stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.6s ease forwards; }
+  #loader svg rect{ animation-delay:.15s; } #loader svg .heart{ animation-delay:.45s; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  #loader .lname{ color:var(--ivory); font-family:Marcellus,serif; letter-spacing:.3em; font-size:1.25rem; opacity:0; animation:fadein .8s .9s forwards; text-align:center; padding-left:.3em; }
+  #loader .lsub{ color:var(--gold); opacity:0; animation:fadein .8s 1.15s forwards; }
+  @keyframes fadein{ to{ opacity:1; } }
+
+  /* ---------- 2. Rotating hero ---------- */
+  .hero-demo{ position:relative; text-align:center; }
+  .arch{ position:relative; width:min(400px,80vw); aspect-ratio:3/4; margin:26px auto 0; overflow:hidden; border-radius:999px 999px 6px 6px; box-shadow:0 30px 60px -25px rgba(23,19,12,.35); }
+  .arch img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 1.6s ease; }
+  .arch img.on{ opacity:1; }
+  #heroName{ font-family:"Cormorant Garamond",serif; font-style:italic; font-size:1.35rem; color:var(--inksoft); margin-top:18px; min-height:1.6em; }
+  #dust{ position:absolute; inset:0; pointer-events:none; }
+
+  /* ---------- 3. Album slider ---------- */
+  .slider-wrap{ width:min(520px,92vw); margin:0 auto; }
+  .slider{ position:relative; aspect-ratio:4/5; overflow:hidden; box-shadow:0 30px 60px -25px rgba(23,19,12,.35); touch-action:none; user-select:none; }
+  .layer{ position:absolute; inset:0; }
+  .layer img.full{ width:100%; height:100%; object-fit:cover; display:block; }
+  .album-page{ background:#fffdf7; height:100%; padding:7% 8%; display:flex; flex-direction:column; }
+  .album-page .main{ width:100%; height:52%; object-fit:cover; }
+  .album-page .script{ font-family:"Cormorant Garamond",serif; font-style:italic; text-align:center; font-size:clamp(1.2rem,4.5vw,1.7rem); margin:5% 0 4%; color:#2b2417; }
+  .album-page .row{ display:flex; gap:4%; flex:1; }
+  .album-page .row img{ width:48%; height:100%; object-fit:cover; }
+  .clip{ overflow:hidden; }
+  .handle{ position:absolute; top:0; bottom:0; width:2px; background:var(--gold); z-index:5; }
+  .knob{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; border-radius:50%; background:var(--ivory); border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; color:var(--golddeep); font-size:1.05rem; box-shadow:0 8px 20px rgba(0,0,0,.25); }
+  .lbl{ position:absolute; bottom:12px; z-index:4; background:rgba(23,19,12,.72); color:var(--ivory); padding:6px 12px; }
+  .lbl.l{ left:12px; } .lbl.r{ right:12px; }
+
+  /* ---------- 4. Date band ---------- */
+  .band{ background:var(--ink); color:var(--ivory); padding:56px 24px; text-align:center; }
+  .band input{ background:transparent; border:1px solid rgba(250,246,238,.4); color:var(--ivory); padding:13px 16px; font-family:"Cormorant Garamond",serif; font-size:1.1rem; color-scheme:dark; }
+  .band a.btn{ display:inline-block; background:var(--gold); color:var(--ivory); text-decoration:none; padding:14px 28px; margin-left:10px; }
+  .proof{ display:flex; flex-wrap:wrap; gap:14px 44px; justify-content:center; margin-top:42px; }
+  .proof b{ font-family:Marcellus,serif; font-weight:400; font-size:1.9rem; color:var(--gold); display:block; }
+  .proof span{ letter-spacing:.28em; text-transform:uppercase; font-size:.62rem; color:rgba(250,246,238,.6); }
+  .top{ text-align:center; padding:110px 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- IDEA 1 · PRELOADER (plays on load) -->
+<div id="loader" aria-hidden="true">
+  <svg width="86" height="86" viewBox="0 0 64 64" fill="none">
+    <path d="M24 14 L28 7 H36 L40 14" stroke="#c9a961" stroke-width="2.4" stroke-linejoin="round"/>
+    <rect x="6" y="14" width="52" height="40" rx="9" stroke="#c9a961" stroke-width="2.4"/>
+    <path class="heart" d="M32 45 C26 39.5 21.5 35.8 21.5 31.4 C21.5 28.2 23.9 26 26.8 26 C29 26 30.9 27.2 32 29 C33.1 27.2 35 26 37.2 26 C40.1 26 42.5 28.2 42.5 31.4 C42.5 35.8 38 39.5 32 45 Z" stroke="#c9a961" stroke-width="2.4" stroke-linejoin="round"/>
+  </svg>
+  <div class="lname">PERFECT MEDIA</div>
+  <div class="lsub caps">Photography · Gorakhpur</div>
+</div>
+
+<div class="top">
+  <p class="caps gold">Demo — not the live site</p>
+  <h1 class="display" style="font-size:clamp(2rem,6vw,3.4rem); margin-top:14px;">Homepage ideas, <span class="serif-i" style="color:var(--golddeep)">live</span></h1>
+  <p class="serif-i" style="color:var(--inksoft); font-size:1.2rem; margin-top:10px;">Four ideas, working, with his real photos. Scroll and try each one.</p>
+  <p style="margin-top:22px;"><button class="replay caps" onclick="replayLoader()">↺ Replay idea 1 — the preloader</button></p>
+</div>
+
+<!-- IDEA 2 + 4 · ROTATING HERO + GOLD DUST -->
+<section class="hero-demo">
+  <div class="head">
+    <span class="tag caps">Idea 2 + 4</span>
+    <h2>Rotating hero, <span class="serif-i" style="color:var(--golddeep)">gold dust</span></h2>
+    <p>The arch photo crossfades between couples every few seconds — names change with it. Gold dust drifts over the frame.</p>
+    <div class="rule"></div>
+  </div>
+  <canvas id="dust"></canvas>
+  <div class="arch" id="arch">
+    <img src="https://kryan21.github.io/perfect-media/photos/arch-couple.jpg" class="on" alt="Together, always" />
+    <img src="https://kryan21.github.io/perfect-media/photos/white-couple.jpg" alt="Neha & Vivek" />
+    <img src="https://kryan21.github.io/perfect-media/photos/bride-curtain.jpg" alt="The bride" />
+  </div>
+  <p id="heroName">Together, always — Gorakhpur</p>
+</section>
+
+<!-- IDEA 3 · ALBUM TO FRAME SLIDER -->
+<section>
+  <div class="head">
+    <span class="tag caps">Idea 3 · my pick</span>
+    <h2>Album page → <span class="serif-i" style="color:var(--golddeep)">the frame</span></h2>
+    <p>Drag the gold handle. Left: how the album page looks. Right: the same moment, full-frame.</p>
+    <div class="rule"></div>
+  </div>
+  <div class="slider-wrap">
+    <div class="slider" id="slider">
+      <div class="layer">
+        <img class="full" src="https://kryan21.github.io/perfect-media/photos/ap-front.jpg" alt="The frame, full-bleed" />
+      </div>
+      <div class="layer clip" id="clipLayer">
+        <div class="album-page" id="albumPage">
+          <img class="main" src="https://kryan21.github.io/perfect-media/photos/ap-front.jpg" alt="Album page" />
+          <p class="script">Anshika weds Prashant</p>
+          <div class="row">
+            <img src="https://kryan21.github.io/perfect-media/photos/bride-red.jpg" alt="" />
+            <img src="https://kryan21.github.io/perfect-media/photos/ap-pair.jpg" alt="" />
+          </div>
+        </div>
+      </div>
+      <span class="lbl l caps">The album page</span>
+      <span class="lbl r caps">The frame</span>
+      <div class="handle" id="handle"><div class="knob">⟷</div></div>
+    </div>
+    <p class="serif-i" style="text-align:center; color:var(--inksoft); margin-top:16px;">On the real site this uses his actual designed pages.</p>
+  </div>
+</section>
+
+<!-- IDEA 4 · DATE CHECK + PROOF -->
+<section style="max-width:none; padding-left:0; padding-right:0;">
+  <div class="head" style="padding:0 20px;">
+    <span class="tag caps">Idea 4</span>
+    <h2>Check your date, <span class="serif-i" style="color:var(--golddeep)">right there</span></h2>
+    <p>One tap from the homepage into a WhatsApp enquiry with the date already written.</p>
+    <div class="rule"></div>
+  </div>
+  <div class="band">
+    <p class="caps" style="color:var(--gold);">Bookings open for 2026 – 2027</p>
+    <p class="display" style="font-size:clamp(1.6rem,4.5vw,2.4rem); margin:16px 0 26px;">Is your date still open?</p>
+    <input type="date" id="datePick" />
+    <a class="btn caps" id="waBtn" href="https://wa.me/9198363574" target="_blank" rel="noreferrer">Check on WhatsApp</a>
+    <div class="proof">
+      <div><b>279+</b><span>Posts on Instagram</span></div>
+      <div><b>842</b><span>Instagram family</span></div>
+      <div><b>♥ 432</b><span>Most-loved reel</span></div>
+      <div><b>50+</b><span>Reels & films</span></div>
+    </div>
+  </div>
+</section>
+
+<p style="text-align:center; padding:0 20px 70px;" class="serif-i">Tell me which ones to build into the real homepage.</p>
+
+<script>
+  /* Preloader */
+  const loader = document.getElementById('loader');
+  function playLoader(){ loader.classList.remove('done'); setTimeout(()=>loader.classList.add('done'), 2300); }
+  function replayLoader(){ window.scrollTo({top:0, behavior:'smooth'}); playLoader(); }
+  setTimeout(()=>loader.classList.add('done'), 2300);
+
+  /* Rotating hero */
+  const slides = [
+    { el: null, name: 'Together, always — Gorakhpur' },
+    { el: null, name: 'Neha & Vivek — The Engagement' },
+    { el: null, name: 'The Bride — Gorakhpur' },
+  ];
+  const imgs = document.querySelectorAll('#arch img');
+  imgs.forEach((im, i)=> slides[i].el = im);
+  let cur = 0;
+  const nameEl = document.getElementById('heroName');
+  setInterval(()=>{
+    slides[cur].el.classList.remove('on');
+    cur = (cur + 1) % slides.length;
+    slides[cur].el.classList.add('on');
+    nameEl.style.opacity = 0;
+    setTimeout(()=>{ nameEl.textContent = slides[cur].name; nameEl.style.opacity = 1; }, 500);
+  }, 4600);
+  nameEl.style.transition = 'opacity .5s';
+
+  /* Gold dust */
+  const cv = document.getElementById('dust'), ctx = cv.getContext('2d');
+  let W, H, parts = [];
+  function sizeDust(){
+    const hero = document.querySelector('.hero-demo');
+    W = cv.width = hero.offsetWidth; H = cv.height = hero.offsetHeight;
+    parts = Array.from({length: 42}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.8+.4, s: Math.random()*.35+.08, drift: Math.random()*0.6-0.3, a: Math.random()*.5+.15 }));
+  }
+  sizeDust(); addEventListener('resize', sizeDust);
+  (function tick(){
+    ctx.clearRect(0,0,W,H);
+    for (const p of parts){
+      p.y -= p.s; p.x += p.drift * .3;
+      if (p.y < -4){ p.y = H + 4; p.x = Math.random()*W; }
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7);
+      ctx.fillStyle = `rgba(168,130,58,${p.a})`; ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  })();
+
+  /* Album slider */
+  const slider = document.getElementById('slider'), clip = document.getElementById('clipLayer'),
+        handle = document.getElementById('handle'), page = document.getElementById('albumPage');
+  function setPos(clientX){
+    const r = slider.getBoundingClientRect();
+    let pct = ((clientX - r.left) / r.width) * 100;
+    pct = Math.max(4, Math.min(96, pct));
+    clip.style.width = pct + '%';
+    page.style.width = r.width + 'px';
+    handle.style.left = pct + '%';
+  }
+  function initSlider(){ const r = slider.getBoundingClientRect(); page.style.width = r.width + 'px'; clip.style.width = '50%'; handle.style.left = '50%'; }
+  initSlider(); addEventListener('resize', initSlider);
+  let dragging = false;
+  slider.addEventListener('pointerdown', e=>{ dragging = true; slider.setPointerCapture(e.pointerId); setPos(e.clientX); });
+  slider.addEventListener('pointermove', e=>{ if (dragging) setPos(e.clientX); });
+  slider.addEventListener('pointerup', ()=> dragging = false);
+  slider.addEventListener('pointercancel', ()=> dragging = false);
+
+  /* Date -> WhatsApp */
+  const dp = document.getElementById('datePick'), wa = document.getElementById('waBtn');
+  dp.addEventListener('change', ()=>{
+    if (!dp.value) return;
+    const d = new Date(dp.value + 'T00:00:00');
+    const nice = d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    wa.href = 'https://wa.me/9198363574?text=' + encodeURIComponent(`Hi Perfect Media! Is ${nice} available for my wedding?`);
+    wa.textContent = 'Check ' + nice.split(',')[1]?.trim().split(' ').slice(0,3).join(' ') + ' →';
+  });
+</script>
+</body>
+</html>
