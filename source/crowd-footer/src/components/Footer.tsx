@@ -63,7 +63,7 @@ function CrowdStrip() {
 
       {/* the designer himself — full colour, middle of the crowd */}
       <img
-        src="art/owner-cut.png"
+        src="art/owner-cut.webp"
         alt="KRYAN standing in the middle of the crowd"
         className="absolute bottom-0 left-1/2 z-10 h-[96%] w-auto max-w-none -translate-x-1/2 drop-shadow-[0_10px_24px_rgba(0,0,0,0.25)]"
         draggable={false}
